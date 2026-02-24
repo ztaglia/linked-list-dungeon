@@ -140,10 +140,10 @@ int main() {
             std::cout << "your inventory: " << std::endl;
             inv.print();
             continue;
-        } else if (command.rfind("take ", 0) == 0) { // command starts with "take ", rfind returns 0 if "take " is found at the start of the string
-            std::string itemName = command.substr(5); // get item name after "take "
-            inv.add(itemName);
-            if (currentRoom->items.remove(itemName)) { // this checks if the item was successfully removed from the room's inventory, which means it was in the room
+        } else if (command.rfind("take ", 0) == 0) {
+            std::string itemName = command.substr(5);
+            if (currentRoom->items.remove(itemName)) {
+                inv.add(itemName);
                 std::cout << "you took the " << itemName << "!" << std::endl;
             } else {
                 std::cout << "there's no " << itemName << " in this room!" << std::endl;
@@ -162,7 +162,7 @@ int main() {
         } else {
             std::cout << "you can't go that way!" << std::endl;
         }
-    } while (command != 'q');
+    } while (command != "q");
     
     return 0;
 }
