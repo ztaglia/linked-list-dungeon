@@ -20,6 +20,7 @@ struct Room {
     Room* east = nullptr;
     Room* west = nullptr;
     std::string description;
+    Inventory items;
 };
 
 class Inventory {
@@ -112,30 +113,48 @@ int main() {
     Room* currentRoom = &entranceHall;
     std::cout << "current room's description: " << currentRoom->description << std::endl;
 
-    char direction;
+    armory.items.add("Sword");
+    armory.items.add("Shield");
+    library.items.add("Dusty Book");
+    treasureRoom.items.add("Gold Crown");
+
+    std::string command;
     do {
-        std::cout << "enter a direction (n/s/e/w) or 'q' to quit: ";
-        std::cin >> direction;
+        std::cout << "enter a direction (n/s/e/w), a stationary action (look/take {item}/inventory) or 'q' to quit: ";
+        std::getline(std::cin, command);
         Room* nextRoom = nullptr;
-        switch (direction) {
-            case 'n':
-                nextRoom = currentRoom->north;
-                break;
-            case 's':
-                nextRoom = currentRoom->south;
-                break;
-            case 'e':
-                nextRoom = currentRoom->east;
-                break;
-            case 'w':
-                nextRoom = currentRoom->west;
-                break;
-            case 'q':
-                std::cout << "bye!" << std::endl;
-                continue;
-            default:
-                std::cout << "invalid direction. try again pls." << std::endl;
-                continue;
+        if (command == "n") {
+            nextRoom = currentRoom->north;
+        } else if (command == "s") {
+            nextRoom = currentRoom->south;
+        } else if (command == "e") {
+            nextRoom = currentRoom->east;
+        } else if (command == "w") {
+            nextRoom = currentRoom->west;
+        } else if (command == "look") {
+            std::cout << "current room's description: " << currentRoom->description << std::endl;
+            std::cout << "items in the room: " << std::endl;
+            currentRoom->items.print();
+            continue;
+        } else if (command == "inventory") {
+            std::cout << "your inventory: " << std::endl;
+            inv.print();
+            continue;
+        } else if (command.rfind("take ", 0) == 0) { // command starts with "take ", rfind returns 0 if "take " is found at the start of the string
+            std::string itemName = command.substr(5); // get item name after "take "
+            inv.add(itemName);
+            if (currentRoom->items.remove(itemName)) { // this checks if the item was successfully removed from the room's inventory, which means it was in the room
+                std::cout << "you took the " << itemName << "!" << std::endl;
+            } else {
+                std::cout << "there's no " << itemName << " in this room!" << std::endl;
+            }
+            continue;
+        } else if (command == "q") {
+            std::cout << "bye!" << std::endl;
+            continue;
+        } else {
+            std::cout << "invalid direction. try again pls." << std::endl;
+            continue;
         }
         if (nextRoom) {
             currentRoom = nextRoom;
@@ -143,7 +162,7 @@ int main() {
         } else {
             std::cout << "you can't go that way!" << std::endl;
         }
-    } while (direction != 'q');
+    } while (command != 'q');
     
     return 0;
 }
