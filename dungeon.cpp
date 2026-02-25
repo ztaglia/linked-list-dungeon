@@ -14,15 +14,6 @@ struct Node {
         // and unique_ptrs can't be copied
 };
 
-struct Room {
-    Room* north = nullptr;
-    Room* south = nullptr;
-    Room* east = nullptr;
-    Room* west = nullptr;
-    std::string description;
-    Inventory items;
-};
-
 class Inventory {
     private:
         std::unique_ptr<Node> head;
@@ -67,21 +58,17 @@ class Inventory {
         }
 };
 
+struct Room {
+    Room* north = nullptr;
+    Room* south = nullptr;
+    Room* east = nullptr;
+    Room* west = nullptr;
+    std::string description;
+    Inventory items;
+};
+
 int main() {
     Inventory inv;
-    
-    inv.add("Sword");
-    inv.add("Shield");
-    inv.add("Rusty Key");
-    
-    std::cout << "Inventory:" << std::endl;
-    inv.print();
-    
-    std::cout << "Removing Shield..." << std::endl;
-    inv.remove("Shield");
-    
-    std::cout << "\nInventory:" << std::endl;
-    inv.print();
 
     Room treasureRoom, armory, entranceHall, library;
     treasureRoom.description = "a room filled with treasure";
@@ -147,6 +134,19 @@ int main() {
                 std::cout << "you took the " << itemName << "!" << std::endl;
             } else {
                 std::cout << "there's no " << itemName << " in this room!" << std::endl;
+            }
+            continue;
+        } else if (command.rfind("drop ", 0) == 0) {
+            std::string itemName = command.substr(5);
+            if (inv.remove(itemName)) {
+                currentRoom->items.add(itemName);
+                std::cout << "you dropped the " << itemName << "!" << std::endl;
+            } else {
+                std::cout << "there's no " << itemName << " in your inventory!" << std::endl;
+            }
+            if (itemName == "Gold Crown" && currentRoom == &entranceHall) {
+                std::cout << "you win!" << std::endl;
+                return 0;
             }
             continue;
         } else if (command == "q") {
